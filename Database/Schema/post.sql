@@ -5,4 +5,7 @@ CREATE TABLE IF NOT EXISTS  post (
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
     user_id INT, FOREIGN KEY (user_id) REFERENCES user(id)
-)
+);
+
+ALTER TABLE post
+    ADD FOREIGN KEY (category_id) REFERENCES category(category_id);

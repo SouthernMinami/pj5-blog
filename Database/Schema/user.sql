@@ -6,4 +6,11 @@ CREATE TABLE IF NOT EXISTS user (
     email_confirmed_at TIMESTAMP,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
-) 
+);
+
+ALTER TABLE user 
+    ADD COLUMN subscription VARCHAR(50),
+    ADD COLUMN subscription_status VARCHAR(50),
+    ADD COLUMN subscription_created_at TIMESTAMP,
+    ADD COLUMN subscription_updated_at TIMESTAMP
+;
