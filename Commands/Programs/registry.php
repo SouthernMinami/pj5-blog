@@ -4,5 +4,5 @@
 // consoleはここから読み取る
 return [
     Commands\Programs\Migrate::class,
-    Commands\Programs\CodeGenreration::class,
+    Commands\Programs\CodeGeneration::class,
 ];
