@@ -50,10 +50,8 @@ abstract class AbstractCommand implements Command
                 throw new Exception(sprintf("%sコマンドを実行するには値を入力してください。", $this->getAlias()));
             }
         } else {
-            if (isset ($args[$startIndex])) {
-                $this->argsMap[$this->getAlias()] = $args[$startIndex];
-                $startIndex++;
-            }
+            $this->argsMap[$this->getAlias()] = $args[$startIndex];
+            $startIndex++;
         }
 
         // すべての引数を$argsに格納
