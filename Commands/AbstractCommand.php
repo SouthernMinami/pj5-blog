@@ -1,10 +1,8 @@
 <?php
 
-// すべてのコマンドの基底となる抽象コマンドクラスです。
-// 新しいコマンドは単に AbstractCommand を拡張し、そのコマンド名と引数オプションを定義し、コマンドの核となる実行内容を設定します。
-// この抽象コマンドは、子クラスに stdout に出力する log() メソッドや引数オプションを取得する方法など、使いやすいヘルパーメソッドを提供します。
-// この基本コマンドクラスの主な仕事は、
-// シェルを通じて渡されたすべての引数を解析し、コマンドが定義するすべての引数と値のペアのハッシュマップを設定することです。
+// このクラスを拡張してコマンドを作成する
+// 子クラスに stdout に出力する log() メソッドや引数オプションを取得する方法などのヘルパーメソッドを含む
+// シェルから渡された引数を解析し、引数のマップを作成するのが目的
 
 namespace Commands;
 
@@ -50,7 +48,9 @@ abstract class AbstractCommand implements Command
         if (!isset ($args[$startIndex]) || $args[$startIndex][0] === '-') {
             if ($this->isCommandValueRequired()) {
                 throw new Exception(sprintf("%sコマンドを実行するには値を入力してください。", $this->getAlias()));
-            } else {
+            }
+        } else {
+            if (isset ($args[$startIndex])) {
                 $this->argsMap[$this->getAlias()] = $args[$startIndex];
                 $startIndex++;
             }
@@ -125,6 +125,7 @@ abstract class AbstractCommand implements Command
 
     public static function getAlias(): string
     {
+        // エイリアスが設定されてない場合はクラス名を返す
         return static::$alias != null ? static::$alias : static::class;
     }
 
