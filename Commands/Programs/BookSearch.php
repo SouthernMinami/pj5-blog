@@ -20,21 +20,9 @@ class BookSearch extends AbstractCommand
 
     public function execute(): int
     {
-        $title = $this->getArgValue('title');
-        $isbn = $this->getArgValue('isbn');
+        $title_opt = $this->getArgValue('title');
+        $isbn_opt = $this->getArgValue('isbn');
 
-        if ($title) {
-            $title_input = readline("書籍のタイトルを入力してください: ");
-            $this->searchByTitle($title_input);
-        } else if ($isbn) {
-            $isbn_input = readline("ISBNを入力してください: ");
-            $this->searchByISBN($isbn_input);
-        }
-        return 0;
-    }
-
-    public function searchByTitle(string $title): void
-    {
         $mysqli = new MySQLWrapper();
         $query = "CREATE TABLE IF NOT EXISTS books (
             key_string varchar(255) PRIMARY KEY,
@@ -47,24 +35,37 @@ class BookSearch extends AbstractCommand
             updated_at timestamp DEFAULT CURRENT_TIMESTAMP
         )";
         $mysqli->query($query);
+        $url = "https://openlibrary.org/search.json";
 
-        $select_query = "SELECT * FROM books WHERE title = '$title'";
+        if ($title_opt) {
+            $title_input = readline("書籍のタイトルを入力してください: ");
+            $url .= "?title=$title_input";
+        } else if ($isbn_opt) {
+            $isbn_input = readline("書籍のISBNを入力してください: ");
+            $url .= "?isbn=$isbn_input";
+        }
+        $res = file_get_contents($url);
+        $data = json_decode($res, true);
+
+        $book_info = $data['docs'][0];
+        $title = $mysqli->real_escape_string($book_info['title']);
+        $key_string = "book-search-title-" . $title;
+        $author = $mysqli->real_escape_string($book_info['author_name'][0]);
+        $publisher = $mysqli->real_escape_string($book_info['publisher'][0]);
+        $isbn = $mysqli->real_escape_string($book_info['isbn'][0]);
+        $pages = intval($book_info['number_of_pages_median'][0]);
+
+        $select_query = "SELECT * FROM books WHERE ";
+        $select_query .= $title_opt ? "title = '" . $title . "'" : "isbn = '" . $isbn . "'";
+
         $result = $mysqli->query($select_query);
+        // resultから1行取得
+        $row = $result->fetch_assoc();
+        var_dump($row);
 
-        if ($result->num_rows === 0) {
-            // Open Libraryから取得したデータをDBに保存
-            $url = "https://openlibrary.org/search.json?title=$title";
-            $res = file_get_contents($url);
-            $data = json_decode($res, true);
-
-            $book_info = $data['docs'][0];
-            $title = $mysqli->real_escape_string($book_info['title']);
-            $key_string = "book-search-title-" . $title;
-            $author = $mysqli->real_escape_string($book_info['author_name'][0]);
-            $publisher = $mysqli->real_escape_string($book_info['publisher'][0]);
-            $isbn = $mysqli->real_escape_string($book_info['isbn'][0]);
-            $pages = intval($book_info['number_of_pages_median'][0]);
-
+        // DBに書籍情報がないか、30日以上経過していたらOpen Libraryから取得
+        if (!$row || strtotime($row['updated_at']) < strtotime('-30 days')) {
+            // Open Libraryから取得した検索結果の最初の書籍情報をDBに保存
             $insert_query = "INSERT INTO books (key_string, title, author, publisher, isbn, pages) VALUES (
                 '{$key_string}',
                 '{$title}',
@@ -74,7 +75,6 @@ class BookSearch extends AbstractCommand
                 '{$pages}'
             )";
 
-
             $mysqli->query($insert_query);
 
             $this->log("書籍情報を取得しました。");
@@ -82,22 +82,9 @@ class BookSearch extends AbstractCommand
 
             $this->log("書籍情報をデータベースに保存しました。");
         } else {
+            // 30日以上経過していたらデータベースの情報を更新
             $this->log("この書籍はデータベースに保存済みです。");
-            // while ($row = $result->fetch_assoc()) {
-            //     $this->log("タイトル: " . $row['title']);
-            //     $this->log("著者: " . $row['author']);
-            //     $this->log("出版社: " . $row['publisher']);
-            //     $this->log("ISBN: " . $row['isbn']);
-            //     $this->log("ページ数: " . $row['pages']);
-            //     $this->log("価格: " . $row['price']);
-            // }
         }
-
+        return 0;
     }
-
-    public function searchByISBN(string $isbn): void
-    {
-        $this->log("ISBNで検索します。");
-    }
-
 }
