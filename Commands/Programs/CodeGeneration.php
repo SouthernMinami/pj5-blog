@@ -16,7 +16,7 @@ class CodeGeneration extends AbstractCommand
     // 引数の割当
     public static function getArgs(): array
     {
-        return [(new Argument('command'))->description('生成するコードの種類を入力してください。')->required(false)];
+        return [(new Argument('name'))->description('生成されるファイル名。')->required(false)];
     }
 
     public function execute(): int
@@ -27,6 +27,10 @@ class CodeGeneration extends AbstractCommand
             case 'command':
                 $this->generateCommand(readline("コマンド名を入力してください: "));
                 break;
+            case 'migration':
+                $migrationName = $this->getArgValue('name');
+                $this->log(sprintf("マイグレーションファイル %s を生成します。", $migrationName));
+                $this->generateMigrationFile($migrationName);
             default:
                 $this->log('Invalid code generation type.');
                 break;
@@ -34,8 +38,63 @@ class CodeGeneration extends AbstractCommand
         return 0;
     }
 
+    // マイグレーションファイルを生成する関数
+    private function generateMigrationFile(string $migrationName): void
+    {
+        // {YYYY-MM-DD}{UNIXTIME}{ClassName}.phpのフォーマットでマイグレーションファイルを生成
+        $filename = sprintf(
+            '%s_%s_%s.php',
+            date('Y-m-d'),
+            time(),
+            $migrationName
+        );
+
+        $migrationContent = $this->getMigrationContent($migrationName);
+
+        // 移行先
+        $path = sprintf("%s/../../Database/Migrations/%s", __DIR__, $filename);
+
+        file_put_contents($path, $migrationContent);
+        $this->log(sprintf("マイグレーションファイル %s が作成されました。", $filename));
+    }
+
+    // マイグレーションファイルの内容を取得する関数
+    private function getMigrationContent(string $migrationName): string
+    {
+        $className = $this->pascalCase($migrationName);
+
+        return <<<MIGRATION
+<?php
+
+namespace Database\Migrations;
+
+use Database\SchemaMigration;
+
+class {$className} implements SchemaMigration
+{
+    public function up(): array
+    {
+        // マイグレーション処理を書く
+        return [];
+    }
+
+    public function down(): array
+    {
+        // ロールバック処理を書く
+        return [];
+    }
+}
+MIGRATION;
+    }
+
+    // スネークケースをパスカルケースに変換する関数
+    private function pascalCase(string $snakeCase): string
+    {
+        return str_replace(' ', '', ucwords(str_replace('_', ' ', $snakeCase)));
+    }
+
     // 新しいコマンドファイルを生成してProgramsに追加する関数
-    public function generateCommand(string $name): void
+    private function generateCommand(string $name): void
     {
         $capitalized_name = ucfirst($name);
         // 空白区切りで引数を取得
