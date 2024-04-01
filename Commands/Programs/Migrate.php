@@ -137,10 +137,10 @@ class Migrate extends AbstractCommand
         // glob ... ワイルドカード文字列と一致するファイルを取得
         $all_files = glob($directory . "/*.php");
 
-        // デフォルトは昇順でファイルをソート
+        // デフォルトは降順でファイルをソート
         usort($all_files, function ($a, $b) use ($order) {
             $compare_result = strcmp($a, $b);
-            return ($order === 'asc') ? $compare_result : -$compare_result;
+            return ($order === 'desc') ? -$compare_result : $compare_result;
         });
 
         return $all_files;
@@ -181,9 +181,58 @@ class Migrate extends AbstractCommand
         $statement->close();
     }
 
-    private function rollback(): void
+    private function rollback(int $n = 1): void
     {
-        $this->log("Rolling back...");
+        $this->log("Rolling back {$n} migration(s)...");
+
+        $last_migration = $this->getLastMigration();
+        $all_migrations = $this->getAllMigrationFiles();
+
+        $last_migration_index = array_search($last_migration, $all_migrations);
+
+        if (!$last_migration_index) {
+            $this->log("最後に実行したマイグレーションが見つかりませんでした。");
+            return;
+        }
+
+        $count = 0;
+        // 最後に実行したマイグレーションからn個分のマイグレーションをロールバック
+        for ($i = $last_migration_index; $count < $n; $i--) {
+            $filename = $all_migrations[$i];
+            $this->log("Rolling back {$filename}...");
+
+            include_once ($filename);
+
+            $migration_class = $this->getClassnameFromMigrationFilename($filename);
+            $migration = new $migration_class();
+
+            $queries = $migration->down();
+            if (empty($queries)) {
+                throw new \Exception("マイグレーションファイルのクエリが空です。");
+            }
+
+            $this->processQueries($queries);
+            $this->removeMigration($filename);
+            $count++;
+        }
+
         $this->log("ロールバックが完了しました。\n");
+    }
+
+    private function removeMigration(string $filename): void
+    {
+        $mysqli = new MySQLWrapper();
+        $statement = $mysqli->prepare("DELETE FROM migrations WHERE filename = ?");
+
+        if (!$statement) {
+            throw new \Exception("クエリの準備に失敗しました。(" . $mysqli->errno . ")" . $mysqli->error);
+        }
+
+        $statement->bind_param('s', $filename);
+        if (!$statement->execute()) {
+            throw new \Exception("クエリの実行に失敗しました。(" . $mysqli->errno . ")" . $mysqli->error);
+        }
+
+        $statement->close();
     }
 }
