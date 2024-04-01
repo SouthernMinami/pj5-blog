@@ -8,4 +8,5 @@ return [
     Commands\Programs\CodeGeneration::class,
     Commands\Programs\DBWipe::class,
     Commands\Programs\BookSearch::class,
+    Commands\Programs\StateMigrate::class,
 ];
