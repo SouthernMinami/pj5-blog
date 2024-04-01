@@ -11,7 +11,7 @@ class CreateTagTable implements SchemaMigration
         // マイグレーション処理を書く
         return [
             "CREATE TABLE tags (
-                id INT PRIMARY KEY AUTO_INCREMENT,
+                id BIGINT PRIMARY KEY AUTO_INCREMENT,
                 tag_name VARCHAR(255) NOT NULL
             )"
         ];

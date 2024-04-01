@@ -10,12 +10,13 @@ class CreateCommentLikeTable implements SchemaMigration
     {
         // マイグレーション処理を書く
         return [
-            "CREATE TABLE comment_likes (
-                user_id INT PRIMARY KEY AUTO_INCREMENT,
-                comment_id INT PRIMARY KEY AUTO_INCREMENT,
-                FOREIGN KEY (user_id) PREFERENCES (users),
-                FOREIGN KEY (comment_id) PREFERENCES (comments)    
-            "
+            "CREATE TABLE comment_likes(
+                user_id BIGINT,
+                comment_id BIGINT,
+                PRIMARY KEY (user_id, comment_id),
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE
+            )"
         ];
     }
 

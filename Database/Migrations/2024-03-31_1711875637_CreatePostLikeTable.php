@@ -11,11 +11,12 @@ class CreatePostLikeTable implements SchemaMigration
         // マイグレーション処理を書く
         return [
             "CREATE TABLE post_likes (
-                user_id INT PRIMARY KEY AUTO_INCREMENT,
-                post_id INT PRIMARY KEY AUTO_INCREMENT,
-                FOREIGN KEY (user_id) PREFERENCES (users),
-                FOREIGN KEY (post_id) PREFERENCES (posts)
-            "
+                user_id BIGINT,
+                post_id INT,
+                PRIMARY KEY (user_id, post_id),
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+            )"
         ];
     }
 

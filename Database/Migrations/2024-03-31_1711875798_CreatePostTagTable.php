@@ -11,10 +11,11 @@ class CreatePostTagTable implements SchemaMigration
         // マイグレーション処理を書く
         return [
             "CREATE TABLE post_tags (
-                post_id INT PRIMARY KEY AUTO_INCREMENT,
-                tag_id INT PRIMARY KEY AUTO_INCREMENT,
-                FOREIGN KEY (post_id) PREFERENCES (posts),
-                FOREIGN KEY (tag_id) PREFERENCES (tags)
+                post_id INT,
+                tag_id BIGINT,
+                PRIMARY KEY (post_id, tag_id),
+                FOREIGN KEY (post_id) REFERENCES posts(id),
+                FOREIGN KEY (tag_id) REFERENCES tags(id)
             )"
         ];
     }
