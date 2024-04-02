@@ -24,6 +24,7 @@ $createTableQuery = "
 
 $mysqli->query($createTableQuery);
 
+
 // データの作成（create）
 $students_data = [
     ['John', 18, 'Mathematics'],
@@ -34,9 +35,19 @@ $students_data = [
 ];
 
 foreach ($students_data as $student) {
-    $insertQuery = "
+    $insert_query = "
         INSERT INTO students (name, age, major)
         VALUES ('{$student[0]}', {$student[1]}, '{$student[2]}')
     ";
-    $mysqli->query($insertQuery);
+    $mysqli->query($insert_query);
+}
+
+
+// データの読み取り（read）   
+$select_query = "SELECT * FROM students";
+$result = $mysqli->query($select_query);
+
+// 一行ずつ取得
+while ($row = $result->fetch_assoc()) {
+    echo "ID: " . $row['id'] . ", Name: " . $row['name'] . ", Age: " . $row['age'] . ", Major: " . $row['major'] . PHP_EOL;
 }
