@@ -80,3 +80,24 @@ $result = $mysqli->query($select_query);
 while ($row = $result->fetch_assoc()) {
     echo "ID: " . $row['id'] . ", Name: " . $row['name'] . ", Age: " . $row['age'] . ", Major: " . $row['major'] . PHP_EOL;
 }
+
+echo "--------------------------------------" . PHP_EOL;
+echo "データの削除" . PHP_EOL;
+
+// データの削除（delete）
+$students_to_delete = ['John', 'Jane'];
+
+foreach ($students_to_delete as $student) {
+    $delete_query = "
+        DELETE FROM students
+        WHERE name = '{$student}'";
+    $mysqli->query($delete_query);
+}
+
+$select_query = "SELECT * FROM students";
+$result = $mysqli->query($select_query);
+
+// 一行ずつ取得
+while ($row = $result->fetch_assoc()) {
+    echo "ID: " . $row['id'] . ", Name: " . $row['name'] . ", Age: " . $row['age'] . ", Major: " . $row['major'] . PHP_EOL;
+}
