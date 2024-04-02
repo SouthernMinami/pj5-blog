@@ -51,3 +51,32 @@ $result = $mysqli->query($select_query);
 while ($row = $result->fetch_assoc()) {
     echo "ID: " . $row['id'] . ", Name: " . $row['name'] . ", Age: " . $row['age'] . ", Major: " . $row['major'] . PHP_EOL;
 }
+
+echo "--------------------------------------" . PHP_EOL;
+echo "データの更新" . PHP_EOL;
+
+// データの更新（update）
+$updates = [
+    ['John', 'Philosophy'],
+    ['Jane', 'Astronomy'],
+    ['Doe', 'Geology'],
+    ['Smith', 'Physics'],
+    ['Brown', 'Computer Engineering'],
+];
+
+foreach ($updates as $update) {
+    $update_query = "
+        UPDATE students
+        SET major = '{$update[1]}'
+        WHERE name = '{$update[0]}'
+    ";
+    $mysqli->query($update_query);
+}
+
+$select_query = "SELECT * FROM students";
+$result = $mysqli->query($select_query);
+
+// 一行ずつ取得
+while ($row = $result->fetch_assoc()) {
+    echo "ID: " . $row['id'] . ", Name: " . $row['name'] . ", Age: " . $row['age'] . ", Major: " . $row['major'] . PHP_EOL;
+}
