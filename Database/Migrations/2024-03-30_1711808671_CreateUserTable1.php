@@ -17,12 +17,7 @@ class CreateUserTable1 implements SchemaMigration
                 email VARCHAR(255) NOT NULL UNIQUE,
                 password VARCHAR(255) NOT NULL,
                 created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                subscription VARCHAR(255) NOT NULL DEFAULT,
-                subscription_status VARCHAR(255) NOT NULL,
-                subscription_created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                subscription_end_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            
+                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )"
         ];
     }

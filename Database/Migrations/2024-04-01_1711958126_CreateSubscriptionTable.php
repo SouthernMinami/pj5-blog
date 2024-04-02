@@ -18,13 +18,7 @@ class CreateSubscriptionTable implements SchemaMigration
                 subscription_end_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 user_id BIGINT,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-            )
-            ALTER TABLE users 
-                DROP COLUMN subscription, 
-                DROP COLUMN subscription_status, 
-                DROP COLUMN subscription_created_at, 
-                DROP COLUMN subscription_end_at
-            "
+            )"
         ];
     }
 
@@ -32,13 +26,7 @@ class CreateSubscriptionTable implements SchemaMigration
     {
         // ロールバック処理を書く
         return [
-            "DROP TABLE subscriptions,
-            ALTER TABLE users 
-                ADD COLUMN subscription VARCHAR(255) NOT NULL DEFAULT,
-                ADD COLUMN subscription_status VARCHAR(255) NOT NULL,
-                ADD COLUMN subscription_created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                ADD COLUMN subscription_end_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            "
+            "DROP TABLE subscriptions"
         ];
     }
 }

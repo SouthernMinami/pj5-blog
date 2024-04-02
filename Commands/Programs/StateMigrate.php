@@ -38,7 +38,7 @@ class StateMigrate extends AbstractCommand
     {
         $mysqli = new MySQLWrapper();
 
-        // ドロップ中のエラーを防ぐために外部キーチェックを無効にします
+        // ドロップ中のエラーを防ぐために外部キーチェックを無効化
         $mysqli->query("SET foreign_key_checks = 0");
 
         $result = $mysqli->query("SHOW TABLES");
@@ -48,7 +48,7 @@ class StateMigrate extends AbstractCommand
             $mysqli->query("DROP TABLE `$table`");
         }
 
-        // ドロップ後に外部キーチェックを再度有効にします
+        // ドロップ後に外部キーチェックを再有効化
         $mysqli->query("SET foreign_key_checks = 1");
     }
 

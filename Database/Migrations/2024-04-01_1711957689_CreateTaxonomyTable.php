@@ -10,15 +10,11 @@ class CreateTaxonomyTable implements SchemaMigration
     {
         // マイグレーション処理を書く
         return [
-            "CREATE TABLE taxonomies (
+            "CREATE TABLE IF NOT EXISTS taxonomies (
                 id BIGINT PRIMARY KEY AUTO_INCREMENT,
                 taxonomy_name VARCHAR(255) NOT NULL,
                 description VARCHAR(255) NOT NULL
-            )
-            DROP TABLE categories,
-            DROP TABLE tags,
-            DROP TABLE post_tags,
-            "
+            )",
         ];
     }
 
