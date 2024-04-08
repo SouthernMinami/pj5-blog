@@ -2,6 +2,8 @@
 
 namespace Database\Seeds;
 
+require_once 'vendor/autoload.php';
+
 use Database\AbstractSeeder;
 
 class ComputerPartsSeeder extends AbstractSeeder
@@ -180,7 +182,27 @@ class ComputerPartsSeeder extends AbstractSeeder
                 0.210,
                 0.460,
                 5
-            ]
+            ],
+            // fakerのダミーデータを10000件生成
+            ...array_map(function () {
+                return [
+                    \Faker\Factory::create()->name,
+                    \Faker\Factory::create()->randomElement(['CPU', 'GPU', 'SSD', 'RAM', 'Motherboard', 'PSU', 'Case']),
+                    \Faker\Factory::create()->company,
+                    \Faker\Factory::create()->bothify('??????????'),
+                    \Faker\Factory::create()->date,
+                    \Faker\Factory::create()->text,
+                    \Faker\Factory::create()->numberBetween(0, 100),
+                    \Faker\Factory::create()->randomFloat(2, 0, 1000),
+                    \Faker\Factory::create()->randomFloat(2, 0, 1),
+                    \Faker\Factory::create()->randomFloat(2, 0, 1000),
+                    \Faker\Factory::create()->randomFloat(2, 0, 10),
+                    \Faker\Factory::create()->randomFloat(2, 0, 10),
+                    \Faker\Factory::create()->randomFloat(2, 0, 10),
+                    \Faker\Factory::create()->numberBetween(0, 10)
+                ];
+
+            }, range(0, 9999))
         ];
     }
 }
