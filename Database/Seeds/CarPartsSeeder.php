@@ -2,9 +2,9 @@
 
 namespace Database\Seeds;
 
-use Database\AbstractSeeder;
-
 require_once 'vendor/autoload.php';
+
+use Database\AbstractSeeder;
 
 class CarPartsSeeder extends AbstractSeeder
 {

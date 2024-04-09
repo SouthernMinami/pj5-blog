@@ -1,7 +1,10 @@
 <?php
 namespace Database;
 
+require_once 'vendor/autoload.php';
+
 use Database\MySQLWrapper;
+use Carbon\Carbon;
 
 abstract class AbstractSeeder implements Seeder
 {
@@ -44,8 +47,10 @@ abstract class AbstractSeeder implements Seeder
     // 各行をtableColumnsと照らし合わせて検証する関数
     protected function validateRow(array $row): void
     {
+        echo count($row) . PHP_EOL;
+        echo count($this->tableColumns) . PHP_EOL;
         if (count($row) !== count($this->tableColumns))
-            throw new \Exception('Row does not match the ');
+            throw new \Exception('Row does not match the ' . $this->tableName . ' table columns.');
 
         foreach ($row as $i => $value) {
             $columnDataType = $this->tableColumns[$i]['data_type'];
@@ -69,11 +74,14 @@ abstract class AbstractSeeder implements Seeder
         $columnNames = array_map(function ($columnInfo) {
             return $columnInfo['column_name'];
         }, $this->tableColumns);
+        // created_atとupdated_atカラムを追加
+        $columnNames = array_merge($columnNames, ['created_at', 'updated_at']);
 
         // プレースホルダーの?はcount($row) - 1回繰り返され、最後の?の後にはカンマをつけない
         // そこにbind_paramで値を挿入する
-        $placeholders = str_repeat('?,', count($row) - 1) . '?';
+        $placeholders = str_repeat('?,', count($columnNames) - 1) . '?';
 
+        $now = Carbon::now();
         $sql = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->tableName,
@@ -88,10 +96,12 @@ abstract class AbstractSeeder implements Seeder
         $dataTypes = implode(array_map(function ($columnInfo) {
             return static::AVAILABLE_TYPES[$columnInfo['data_type']];
         }, $this->tableColumns));
+        // created_atとupdated_atのデータ型を追加
+        $dataTypes .= 'ss';
 
         // 文字の配列（文字列）を取り、それぞれに行の値を挿入する
         // 例：$stmt->bind_param('iss', ...array_values([1, 'John', 'john@example.com'])) は、ステートメントに整数(i)、文字列(s)、文字列(s)を挿入する
-        $row_values = array_values($row);
+        $row_values = array_merge(array_values($row), [$now, $now]);
         $stmt->bind_param($dataTypes, ...$row_values);
 
         $stmt->execute();

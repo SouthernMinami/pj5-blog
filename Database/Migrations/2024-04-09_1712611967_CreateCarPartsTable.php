@@ -10,14 +10,16 @@ class CreateCarPartsTable implements SchemaMigration
     {
         // マイグレーション処理を書く
         return [
-            "CREATE TABLE IF NOT EXISTS car_parts (
+            "CREATE TABLE car_parts (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 car_id INT NOT NULL,
                 FOREIGN KEY (car_id) REFERENCES cars(id),
                 name VARCHAR(255) NOT NULL,
                 description TEXT,
                 price FLOAT NOT NULL,
-                quantity_in_stock INT NOT NULL
+                quantity_in_stock INT NOT NULL,
+                created_at TIMESTAMP,
+                updated_at TIMESTAMP
             )"
         ];
     }
