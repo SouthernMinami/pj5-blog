@@ -20,7 +20,6 @@ if (!$part) {
     exit;
 }
 
-// TODO: 上記のロジックをViewから分離
 
 // パーツをカード表示
 // htmlspecialchar ... 特殊文字をHTMLエンティティに変換する

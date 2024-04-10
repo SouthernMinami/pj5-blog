@@ -8,6 +8,9 @@ spl_autoload_register(function ($class) {
     }
 });
 
+// デバッグモードを設定
+$DEBUG = true;
+
 // ルートをロード
 $routes = include ('Routing/routes.php');
 
@@ -17,21 +20,37 @@ $path = ltrim($path, '/');
 
 // ルートパスの一致を確認
 if (isset($routes[$path])) {
-    $view = $routes[$path];
-    $viewPath = sprintf("%s/Views/%s.php", __DIR__, $view);
+    // コールバックを呼び出してrendererを作成。
+    $renderer = $routes[$path]();
 
-    if (file_exists($viewPath)) {
+    try {
         // ヘッダーを設定
-        include 'Views/layout/header.php';
-        include $viewPath;
-        include 'Views/layout/footer.php';
-    } else {
+        foreach ($renderer->getFields() as $name => $value) {
+            // ヘッダーに設定する値をサニタイズ
+            $sanitized_value = filter_var($value, FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES);
+
+            // サニタイズされた値が元の値と一致する場合、ヘッダーを設定する
+            if ($sanitized_value && $sanitized_value === $value) {
+                header("{$name}: {$sanitized_value}");
+            } else {
+                // ヘッダー設定に失敗した場合、ログに記録するか処理する
+                // エラー処理によっては、例外をスローするか、デフォルトのまま続行できる
+                http_response_code(500);
+                if ($DEBUG)
+                    print ("Failed setting header - original: '$value', sanitized: '$sanitized_value'");
+                exit;
+            }
+
+            print ($renderer->getContent());
+        }
+    } catch (Exception $e) {
         http_response_code(500);
-        printf("<br>debug info:<br>%s<br>%s", "Internal error, please contact the admin.");
+        print ("Internal error, please contact the admin.<br>");
+        if ($DEBUG)
+            print ($e->getMessage());
     }
 } else {
     // 一致するルートがない場合、404エラー
     http_response_code(404);
     echo "404 Not Found: The requested route was not found on this server.";
-    printf("<br>debug info:<br>%s<br>%s", json_encode($routes), $path);
 }
