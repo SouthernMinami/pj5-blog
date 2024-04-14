@@ -38,4 +38,24 @@ class DatabaseHelper
 
         return $part;
     }
+
+    public static function getComputerPartsByType(string $type, int $page, int $perpage): array
+    {
+        $db = new MySQLWrapper();
+
+        // ページネーションのためのオフセットを計算
+        $offset = ($page - 1) * $perpage;
+        
+        $stmt = $db->prepare("SELECT * FROM computer_parts WHERE type = ? LIMIT ?, ?");
+        $stmt->bind_param('sii', $type, $offset, $perpage);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $parts = $result->fetch_all(MYSQLI_ASSOC);
+
+        if (!$parts)
+            throw new Exception('Could not find any parts in database');
+
+        return $parts;
+    }
 }
