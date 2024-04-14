@@ -82,4 +82,24 @@ class DatabaseHelper
 
         return $parts;
     }
+
+    public static function getNewestComputerParts(int $page, int $perpage): array
+    {
+        $db = new MySQLWrapper();
+
+        $offset = ($page - 1) * $perpage;
+
+        // created_atで降順に並べ替え、ページネーションを適用
+        $stmt = $db->prepare("SELECT * FROM computer_parts ORDER BY created_at DESC LIMIT ?, ?");
+        $stmt->bind_param('ii', $offset, $perpage);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $parts = $result->fetch_all(MYSQLI_ASSOC);
+
+        if (!$parts)
+            throw new Exception('Could not find any parts in database');
+
+        return $parts;
+    }
 }

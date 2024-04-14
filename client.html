@@ -36,6 +36,12 @@
                 <button id="randomComputerBtn" type="button" class="btn btn-secondary random-computer-button">Get
                     Today's Random Computer</button>
             </div>
+            <div class="d-flex newest-parts">
+                <input type="text" id="page" class="form-control" placeholder="Enter Page Number">
+                <input type="text" id="perpage" class="form-control" placeholder="Enter Item Counts per Page">
+                <button id="newestBtn" type="button" class="btn btn-secondary newest-parts-button">Get Newest
+                    Parts</button>
+            </div>
         </div>
         <!-- 内容はここに挿入されます。 -->
         <div id="content"></div>
@@ -158,6 +164,27 @@
             const content = document.getElementById('content')
             content.innerHTML = ''
             fetch('http://127.0.0.1:8000/api/random/computer')
+                .then(res => res.json())
+                .then(data => {
+                    const parts = data.parts
+                    parts.forEach(part => {
+                        content.innerHTML += partCard(part)
+                    })
+                })
+                .catch(error => {
+                    console.error('There was an error fetching the data:', error)
+                    content.innerHTML = '<div class="alert alert-danger">An error occurred while fetching data.</div>'
+                })
+        })
+
+        // 最新のパーツを取得するボタンのクリックイベント
+        const newestPartsButton = document.getElementById('newestBtn')
+        newestPartsButton.addEventListener('click', () => {
+            const content = document.getElementById('content')
+            const page = document.getElementById('page').value
+            const perpage = document.getElementById('perpage').value
+            content.innerHTML = ''
+            fetch(`http://127.0.0.1:8000/api/parts/newest?page=${page}&perpage=${perpage}`)
                 .then(res => res.json())
                 .then(data => {
                     const parts = data.parts

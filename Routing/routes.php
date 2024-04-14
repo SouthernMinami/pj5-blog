@@ -27,6 +27,10 @@ return [
         $parts = DatabaseHelper::getComputerPartsByType($type, $page, $perpage);
         return new HTMLRenderer('component/parts-list', ['parts' => $parts]);
     },
+    'random/computer' => function (): HTTPRenderer {
+        $parts = DatabaseHelper::getRandomComputer();
+        return new HTMLRenderer('component/computer', ['parts' => $parts]);
+    },
     'api/random/part' => function (): HTTPRenderer {
         $part = DatabaseHelper::getRandomComputerPart();
         return new JSONRenderer(['part' => $part]);
@@ -47,5 +51,12 @@ return [
     'api/random/computer' => function (){
         $parts = DatabaseHelper::getRandomComputer();
         return new JSONRenderer(['parts' => $parts]);
-    }
+    },
+    'api/parts/newest' => function () {
+        $page = $_GET['page'] ?? 1;
+        $perpage = $_GET['perpage'] ?? 3;
+
+        $parts = DatabaseHelper::getNewestComputerParts($page, $perpage);
+        return new JSONRenderer(['parts' => $parts]);
+    },
 ];
