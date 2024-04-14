@@ -58,4 +58,28 @@ class DatabaseHelper
 
         return $parts;
     }
+
+    public static function getRandomComputer(): array {
+        $db = new MySQLWrapper();
+
+        $parts = [
+            'SELECT * FROM computer_parts WHERE type = "CPU" ORDER BY RAND() LIMIT 1',
+            'SELECT * FROM computer_parts WHERE type = "GPU" ORDER BY RAND() LIMIT 1',              
+            'SELECT * FROM computer_parts WHERE type = "SSD" ORDER BY RAND() LIMIT 1',
+            'SELECT * FROM computer_parts WHERE type = "RAM" ORDER BY RAND() LIMIT 1',
+            'SELECT * FROM computer_parts WHERE type = "Motherboard" ORDER BY RAND() LIMIT 1',
+            'SELECT * FROM computer_parts WHERE type = "PSU" ORDER BY RAND() LIMIT 1',
+            'SELECT * FROM computer_parts WHERE type = "Case" ORDER BY RAND() LIMIT 1'
+        ];
+
+        foreach ($parts as $key => $query) {
+            $stmt = $db->prepare($query);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $part = $result->fetch_assoc();
+            $parts[$key] = $part;
+        }
+
+        return $parts;
+    }
 }

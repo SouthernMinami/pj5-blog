@@ -44,4 +44,8 @@ return [
         $parts = DatabaseHelper::getComputerPartsByType($type, $page, $perpage);
         return new JSONRenderer(['parts' => $parts]);
     },
+    'api/random/computer' => function (){
+        $parts = DatabaseHelper::getRandomComputer();
+        return new JSONRenderer(['parts' => $parts]);
+    }
 ];

@@ -32,6 +32,10 @@
                 <button id="typeBtn" type="button" class="btn btn-secondary type-parts-button">Get Parts of a particular
                     Type</button>
             </div>
+            <div class="d-flex random-computer">
+                <button id="randomComputerBtn" type="button" class="btn btn-secondary random-computer-button">Get
+                    Today's Random Computer</button>
+            </div>
         </div>
         <!-- 内容はここに挿入されます。 -->
         <div id="content"></div>
@@ -135,6 +139,25 @@
             const perpage = document.getElementById('perpage').value
             content.innerHTML = ''
             fetch(`http://127.0.0.1:8000/api/types?type=${partType}&page=${page}&perpage=${perpage}`)
+                .then(res => res.json())
+                .then(data => {
+                    const parts = data.parts
+                    parts.forEach(part => {
+                        content.innerHTML += partCard(part)
+                    })
+                })
+                .catch(error => {
+                    console.error('There was an error fetching the data:', error)
+                    content.innerHTML = '<div class="alert alert-danger">An error occurred while fetching data.</div>'
+                })
+        })
+
+        // ランダムでコンピュータを取得するボタンのクリックイベント
+        const randomComputerButton = document.getElementById('randomComputerBtn')
+        randomComputerButton.addEventListener('click', () => {
+            const content = document.getElementById('content')
+            content.innerHTML = ''
+            fetch('http://127.0.0.1:8000/api/random/computer')
                 .then(res => res.json())
                 .then(data => {
                     const parts = data.parts
