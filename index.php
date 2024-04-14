@@ -8,6 +8,8 @@ spl_autoload_register(function ($class) {
     }
 });
 
+header('Access-Control-Allow-Origin: *');
+
 // デバッグモードを設定
 $DEBUG = true;
 
